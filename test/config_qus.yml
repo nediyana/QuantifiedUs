@@ -1,0 +1,81 @@
+journal:
+  Filename:
+    journal.enex
+  Filetype:
+    evernote
+  ExportQuery:
+    "tag:journal"
+  DateCol:
+    Format: "%Y%m%d"
+  Metrics:
+    NoteCount: "nrow(t)"
+    NoteSize: "mean(nchar(t$Content))"
+    SleepT: "tag.vals(t$Tags, 'sleep')"
+    WakeT: "tag.vals(t$Tags, 'wakeup')"
+    Mood: "tag.vals(t$Tags, 'mood', 'mean')"
+    Pmdr: "tag.vals(t$Tags, 'p', 'sum')"
+    MoodVar: "tag.vals(t$Tags, 'mood', 'sd')"
+    MoodPtn: "tag.vals(t$Tags, 'mood')"
+twitter:
+  Filename:
+    twitter.enex
+  Filetype:
+    evernote
+  ExportQuery:
+    "tag:tweet"
+  DateCol:
+    Name: CreatedAt
+    Format: "%Y%m%dT%H%M%SZ"
+  Metrics:
+    TweetCount: "nrow(t)"
+location:
+  Filename:
+    ^tracks
+  Filetype:
+    followmee
+  PrimaryKeys:
+    [Date]
+  DateCol:
+    Format: "%F %r"
+  Metrics:
+    AtHomeR: "length(which(t$DistHome < 0.1)) / nrow(t)"
+    AtWorkR: "length(which(t$DistWork < 0.5)) / nrow(t)"
+mint:
+  Filename:
+    ^transactions
+  Filetype:
+    csv
+  DateCol:
+    Format: "%m/%d/%Y"
+  PrimaryKeys:
+    [Date, Original.Description]
+  IncludeCols:
+    [Date, Amount, Category, Labels]
+  IncludeRows:
+    Transaction.Type: debit
+  Metrics:
+    ExpCount: "nrow(t)"
+    ExpTotal: "sum(t$Amount)"
+kindle:
+  Filename:
+    Clippings.txt
+  Filetype:
+    kindle
+  IncludeCols:
+    [Date, Book, Author]
+  DateCol:
+    Format: "%Y-%m-%d %H:%M:%S %z"
+  Metrics:
+    QuoteCount: "nrow(t)"
+calendar:
+  Filename:
+    ^export
+  Filetype:
+    csv
+  IncludeCols:
+    [Subject, "Date", "Start.Time", "End.Time"]
+  DateCol:
+    Name: "Start.Date"
+    Format: "%m/%d/%Y"
+  Metrics:
+    ScheduleCount: "nrow(t)"
