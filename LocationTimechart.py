@@ -88,14 +88,13 @@ def main(input_location_csv, output_chart_name):
 		durations.append(duration)
 		colors.append(matchColor(currentLocation))
 
-	numweeks = days[-1] / 7.0
 	daysPlusOne = max(days) + 1
 	
 	def dayFormatter(pos, day):
 		return (EARLIEST_DATETIME + datetime.timedelta(daysPlusOne-day-1)).strftime("%b %d")
 
 	days = [daysPlusOne - day for day in days]
-	figure(figsize=(9, 1.5*numweeks)) # seems to be a reasonable approximation
+	figure(figsize=(9, 1.5*daysPlusOne / 7)) # seems to be a reasonable approximation
 	barplot = barh(days, durations, left=startTimes, color=colors, linewidth=0, height=1)
 	ylim(1, daysPlusOne)
 	xlim(0, 24)

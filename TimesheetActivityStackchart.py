@@ -12,7 +12,7 @@ from pylab import *
 # PARAMETERS
 EARLIEST_DATE = datetime.date(2013, 8, 1)
 CATEGORIES = ['Work'] # categories that will be charted. alternate values: ['Uncategorized'] or ['Work', 'Uncategorized']
-WEEKLY_OR_DAILY = 'weekly' # alternate value: 'daily'
+WEEKLY_OR_DAILY = 'both' # alternate values: 'daily', 'weekly'
 COLORS = ['#87CEEB','#32CD32','#BA55D3','#F08080','#4682B4','#9ACD32','#40E0D0','#FF69B4','#F0E68C','#D2B48C', 'black']
 
 def main(input_schedule_csv, output_chart_name):
@@ -52,7 +52,7 @@ def main(input_schedule_csv, output_chart_name):
 				ActivityNames.add(activity)
 		return list(ActivityNames)
 
-	def generateChart(datas, dates, output_chart_name):
+	def generateChart(datas, dates, output_chart_name, aggregation):
 		names = sorted(datas.keys(), key=lambda name: sum(datas[name]), reverse=True)
 		figure(figsize=(12,8))
 		gca().spines['top'].set_visible(False)
@@ -62,13 +62,13 @@ def main(input_schedule_csv, output_chart_name):
 		ylabel('Total Hours')
 		grid(b=True, which='major', color='#C0C0C0', linestyle='-', alpha=0.9)
 		minutes = [datas[ActivityName] for ActivityName in names]
-		if WEEKLY_OR_DAILY == 'daily':
+		if aggregation == 'daily':
 			xlabel('Days -->')
 			ytickmarks = range(0, 7 * 24 * 60, 60)
 			ylabels = range(len(ytickmarks))
 			xtickmarks = range(int(dates[0]), int(dates[-1]) + 1)
 			x = dates
-		else:
+		elif aggregation == 'weekly':
 			xlabel('Weeks -->')
 			ytickmarks = range(0, 7 * 24 * 60, 60 * 10)
 			ylabels = range(0, len(ytickmarks) * 10, 10)
@@ -80,7 +80,7 @@ def main(input_schedule_csv, output_chart_name):
 		# wish I could plot this horizontally, but couldn't figure out how to rotate the orientation
 		polys = stackplot(x, *minutes, linewidth=0, colors=COLORS) # baseline='weighted_wiggle' is interesting
 		legend([Rectangle((0, 0), 1, 1, fc=poly.get_facecolor()[0]) for poly in polys][::-1], names[::-1], bbox_to_anchor=(0, 0, 1, 1), bbox_transform=gcf().transFigure, loc=9, ncol=5)
-		savefig(output_chart_name, bbox_inches='tight')
+		savefig(aggregation + '.' + output_chart_name, bbox_inches='tight')
 
 	d = {}
 	for line in open(input_schedule_csv, 'rU'):
@@ -106,7 +106,10 @@ def main(input_schedule_csv, output_chart_name):
 			datas[k][-1] = d[date][k]
 			dayTotal += d[date][k]
 	
-	generateChart(datas, dates, output_chart_name)
+	if WEEKLY_OR_DAILY == 'weekly' or 'both':
+		generateChart(datas, dates, output_chart_name, 'weekly')
+	if WEEKLY_OR_DAILY == 'daily' or 'both':
+		generateChart(datas, dates, output_chart_name, 'daily')
 	
 if __name__ == "__main__":
 	if len(sys.argv) < 3:
