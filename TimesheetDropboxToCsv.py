@@ -24,7 +24,7 @@ def main(input_dropbox_access_token, output_schedule_csv):
 	most_recent_file = sorted(folder_metadata['contents'], key=lambda f: f['path'])[-1]
 	file_upload_timestamp = most_recent_file['modified'].rsplit(':', 1)[0] # drop time zone (it's always UTC), seconds
 	file_upload_datetime = datetime.datetime.strptime(file_upload_timestamp, '%a, %d %b %Y %H:%M')
-	file_upload_localtime = file_upload_datetime.replace(tzinfo=tz.gettz('UTC')).astimezone(tz.tzlocal())
+	file_upload_localtime = file_upload_datetime.replace(tzinfo=tz.gettz('UTC')).astimezone(tz.tzlocal()).replace(tzinfo=None)
 	with open(TIMESHEET_XML, 'w') as timesheet:
 		fp = client.get_file(most_recent_file['path']).read()
 		timesheet.write(fp)
