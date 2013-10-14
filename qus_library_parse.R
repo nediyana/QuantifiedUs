@@ -23,7 +23,7 @@ export.evernote <- function(export.query, export.filename)
 parse.evernote <- function(filename, ...)
 {
 	out.filename = str_replace(filename, ".enex" ,".tsv")
-	run.cmd(sprintf("ruby -I lib/rb QuantifiedUs/evernote/evernote_parse.rb \"%s\" %s", filename, out.filename))
+	run.cmd(sprintf("ruby -I lib/rb QuantifiedUs/evernote/evernote_parse.rb %s %s", filename, out.filename))
 	if(file.exists(out.filename))
 		parse.table(out.filename, quote="")
 	else

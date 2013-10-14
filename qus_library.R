@@ -32,18 +32,27 @@ import.data <- function(path, o = list())
 		dt = dt[!duplicated(dt[,o$PrimaryKeys]),]
 		printf("  %d records left", nrow(dt))
 	}
+	# Process date column
 	if(!is.null(o$DateCol))
 	{
 		DateColName = "Date"
 		if(!is.null(o$DateCol$Name))
 			DateColName = o$DateCol$Name
 		dt$Date = as.Date(as.character(dt[[DateColName]]), o$DateCol$Format)
-		#browser()
+		if(!is.null(o$DateCol$Offset))
+			dt$Date = dt$Date + as.numeric(o$DateCol$Offset)
 	}
+	# Process row/column filtering
 	if(!is.null(o$IncludeRows))
 	{
 		for(key in names(o$IncludeRows)){
-			dt = dt[dt[[key]] == o$IncludeRows[[key]], ]
+			dt = dt[dt[[key]] %in% o$IncludeRows[[key]], ]
+		}
+	}
+	if(!is.null(o$ExcludeRows))
+	{
+		for(key in names(o$ExcludeRows)){
+			dt = dt[!(dt[[key]] %in% o$ExcludeRows[[key]]), ]
 		}
 	}
 	if(!is.null(o$IncludeCols))
@@ -54,9 +63,9 @@ import.data <- function(path, o = list())
 agg.data <- function(tbl, key, m = list())
 {
 	ddply(tbl, key, function(t){
+		#printf("key: %s / count: %d", format(t$Date[1], "%Y-W%W"), nrow(t))
 		res = list()
 		for(mkey in names(m)){
-			#browser()
 			res[[mkey]] = eval(parse(text=m[[mkey]]))
 		}
 		as.data.frame(res)
@@ -117,4 +126,11 @@ extract.tag <- function(data, tag.name, fun = NULL)
 tag.vals <- function(col, tag.name, fun = NULL)
 {
 	sapply( strsplit(col, split="[, ]+"), extract.tag, tag.name, fun)
+}
+
+extract.workflowy <- function(content)
+{
+	#browser()
+	pattern = ".*\\((\\d+) completed, (\\d+) created, .*"
+	list(completed = as.numeric(gsub(pattern,"\\1", content, perl=T)), created=as.numeric(gsub(pattern,"\\2", content, perl=T)))
 }

@@ -53,6 +53,9 @@ mint:
     [Date, Amount, Category, Labels]
   IncludeRows:
     Transaction.Type: debit
+  ExcludeRows:
+    Category: [Transfer,"Cash & ATM","Mortgage & Rent","Credit Card Payment"]
+    Labels: [Reimbursable]
   Metrics:
     ExpCount: "nrow(t)"
     ExpTotal: "sum(t$Amount)"
@@ -79,3 +82,17 @@ calendar:
     Format: "%m/%d/%Y"
   Metrics:
     ScheduleCount: "nrow(t)"
+workflowy:
+  Filename:
+    workflowy.enex
+  Filetype:
+    evernote
+  ExportQuery:
+    "tag:Workflowy"
+  DateCol:
+    Name: CreatedAt
+    Format: "%Y%m%dT%H%M%SZ"
+    Offset: -1
+  Metrics:
+    CntFin: "extract.workflowy(t$Content[1])$completed"
+    CntNew: "extract.workflowy(t$Content[1])$created"
