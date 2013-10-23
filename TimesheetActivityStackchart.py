@@ -16,16 +16,10 @@ WEEKLY_OR_DAILY = 'both' # alternate values: 'daily', 'weekly'
 COLORS = ['#87CEEB','#32CD32','#BA55D3','#F08080','#4682B4','#9ACD32','#40E0D0','#FF69B4','#F0E68C','#D2B48C', 'black']
 
 def main(input_schedule_csv, output_chart_name):
-	def MinutesToHHMM(minutes):
-		return str(minutes / 60) + ':' + ('0' if minutes % 60 < 10 else '') + str(minutes % 60)
-	
 	def HHMMToMinutes(hhmm):
 		hhmmsplit = hhmm.split(':')
-		if len(hhmmsplit) == 3:
-			(hh, mm, ss) = tuple(hhmmsplit)
-			assert(int(ss) == 0)
-		else:
-			(hh, mm) = tuple(hhmmsplit)
+		(hh, mm, ss) = tuple(hhmmsplit)
+		assert(int(ss) == 0)
 		return int(hh) * 60 + int(mm)
 
 	def chunks(l, n):
