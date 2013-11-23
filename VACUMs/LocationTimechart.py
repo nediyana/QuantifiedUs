@@ -13,8 +13,8 @@ from pylab import *
 # PARAMETERS
 EARLIEST_POI = 'Home' # where you started on EARLIEST_DATETIME
 EARLIEST_DATETIME = datetime.datetime(2013, 8, 1)
-POINTS_OF_INTEREST = {'Home': (FILLIN_HOME_LATITUDE, FILLIN_HOME_LONGITUDE, '#4682B4'),
-                      'Office': (FILLIN_OFFICE_LATITUDE, FILLIN_OFFICE_LONGITUDE, '#E0830A')}
+POINTS_OF_INTEREST = {'Home': (41.827990, -71.393023, '#4682B4'),
+                      'Office': (41.827103, -71.399825, '#E0830A')}
 DEFAULT_POI = ('Other', '#BA55D3')
 ACCEPTABLE_DISTANCE = 100 # in meters. seems to work better than 150
 
@@ -94,7 +94,7 @@ def main(input_location_csv, output_chart_name):
 		return (EARLIEST_DATETIME + datetime.timedelta(daysPlusOne-day-1)).strftime("%b %d")
 
 	days = [daysPlusOne - day for day in days]
-	figure(figsize=(9, 1.5*daysPlusOne / 7)) # seems to be a reasonable approximation
+	figure(figsize=(9, 1.3*daysPlusOne / 7)) # seems to be a reasonable approximation
 	barplot = barh(days, durations, left=startTimes, color=colors, linewidth=0, height=1)
 	ylim(1, daysPlusOne)
 	xlim(0, 24)

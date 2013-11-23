@@ -6,7 +6,7 @@
 <link href="lib/nv.d3.css" rel="stylesheet" type="text/css">
 <style>
 svg {
-  height: 500px;
+  height: 600px;
 }
 .toggle {
   cursor: pointer;
@@ -25,8 +25,11 @@ svg {
 <script src="lib/nv.d3.min.js"></script>
 <script>
 
+// BUG: See https://github.com/novus/nvd3/issues/364
+
 var dailyDatafile = "activity.daily.json";
 var weeklyDatafile = "activity.weekly.json";
+var disabledSeries = [1]
 
 d3.json(dailyDatafile, function(dailyData) {
 
@@ -52,6 +55,13 @@ d3.json(dailyDatafile, function(dailyData) {
       .datum(dailyData)
       .transition().duration(0)
       .call(chart);
+
+    var state = chart.state();
+    for(var i=0; i < state.disabled.length; i++) {
+      if (i in disabledSeries)
+        state.disabled[i] = true;
+    }
+    chart.dispatch.changeState(state);
 
     var plotHeight = parseInt(d3.select("rect").attr('height'));
 
@@ -85,6 +95,12 @@ d3.json(dailyDatafile, function(dailyData) {
           .datum(dailyData)
           .transition().duration(0)
           .call(chart);
+        var state = chart.state();
+        for(var i=0; i < state.disabled.length; i++) {
+          if (i in disabledSeries)
+            state.disabled[i] = true;
+        }
+        chart.dispatch.changeState(state);
       });
     };
 
@@ -99,6 +115,12 @@ d3.json(dailyDatafile, function(dailyData) {
           .datum(weeklyData)
           .transition().duration(0)
           .call(chart);
+        var state = chart.state();
+        for(var i=0; i < state.disabled.length; i++) {
+          if (i in disabledSeries)
+            state.disabled[i] = true;
+        }
+        chart.dispatch.changeState(state);
       });
     };
     
