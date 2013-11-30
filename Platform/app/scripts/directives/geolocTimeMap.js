@@ -5,7 +5,7 @@ angular.module('prototypeApp')
     // constants
 
     var height = 500,
-        origin = [-71.42, 41.83],
+        origin = [-71.42, 41.83], // seatle: -122.33, 47.65; pvd: -71.42, 41.83
         width = 900;
 
     return {
@@ -26,7 +26,7 @@ angular.module('prototypeApp')
 
           var projection = d3.geo.mercator()
               .center(origin)
-              .scale((1 << 22) / 2 / Math.PI)
+              .scale((1 << 16) / 2 / Math.PI)
               .translate([width / 2, height / 2]);
 
           var path = d3.geo.path()

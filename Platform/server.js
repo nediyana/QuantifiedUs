@@ -3,15 +3,15 @@
 
 var express     = require('express'),
     http        = require('http'),
-    port        = process.argv[2] || 8000;
+    port        = process.argv[2] || 8002;
 
 // Server setup
 var app = express();
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/app'));
 
-app.get('/b', function(req, res) {
-  res.sendfile('sampleData/sampleGeoPoints.json');
+app.get('/geolocTimeData', function(req, res) {
+  res.sendfile('sampleData/locations.json');
 });
 
 app.get('/activityData', function(req, res) {
