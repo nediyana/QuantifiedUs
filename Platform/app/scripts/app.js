@@ -15,6 +15,10 @@ angular.module('prototypeApp', [
         templateUrl: 'views/geolocTimeMap.html',
         controller: 'GeolocTimeMapCtrl'
       })
+      .when('/activityStackchart', {
+        templateUrl: 'views/activityStackchart.html',
+        controller: 'ActivityStackchartCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
