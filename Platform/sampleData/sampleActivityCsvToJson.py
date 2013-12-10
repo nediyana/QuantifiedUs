@@ -12,11 +12,11 @@ for d in rawData:
   name = d['category']
   valueStr = [d['startDate'], d['duration']] # x, y values
   if name in outData:
-    outData[name]['values'].append(value)
+    outData[name]['values'].append(valueStr)
   else:
-    outData[name] = {'values':[value]}
+    outData[name] = {'values':[valueStr]}
 
 outArray = []
 for k, v in outData.iteritems():
-  outArray.append({'name': k, 'values':v['values']})
+  outArray.append({'key': k, 'values':v['values']})
 print json.dumps([d for d in outArray])

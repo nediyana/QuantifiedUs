@@ -15,7 +15,7 @@ app.get('/geolocTimeData', function(req, res) {
 });
 
 app.get('/activityData', function(req, res) {
-  res.sendfile('sampleData/sampleActivity.json');
+  res.sendfile('sampleData/sampleActivity_daily.json');
 });
 
 // Create the server and tell which port to listen to

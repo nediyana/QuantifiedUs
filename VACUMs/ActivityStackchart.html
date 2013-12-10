@@ -21,7 +21,7 @@ svg {
   <div>
     <svg></svg>
   </div>
-<script src="lib/d3.v3.min.js"></script>
+<script src="lib/d3.v3.js"></script>
 <script src="lib/nv.d3.min.js"></script>
 <script>
 
@@ -50,13 +50,14 @@ d3.json(dailyDatafile, function(dailyData) {
     chart.xAxis.tickFormat(function(d) { return d3.time.format('%b %e')(new Date((d - 719162) * 24 * 60 * 60 * 1000)) });
     chart.yAxis.tickFormat(function(d) { return Math.floor(d / 60) + ':' + (d % 60 < 10 ? '0' : '') + d % 60; });
     chart.controlsData(['Stacked', 'Expanded']);
-  
+
     d3.select('svg')
       .datum(dailyData)
       .transition().duration(0)
       .call(chart);
 
     var state = chart.state();
+    console.log(state);
     for(var i=0; i < state.disabled.length; i++) {
       if (i in disabledSeries)
         state.disabled[i] = true;
