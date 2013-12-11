@@ -35,13 +35,16 @@ angular.module('prototypeApp')
               .style('height', height + 'px')
               .on('mousemove', mousemoved);
 
-          var info = mapContainer.append('div')
+          var info = d3.select(element[0]).append('div')
               .attr('class', 'info');
 
-          var mapLayer = map.append('div').attr('class', 'mapLayer'),
-              ptsLayer = map.append('svg').append('g');
+          var mapSvg = map.append('svg'),
+              mapLayer = mapSvg.append('g').attr('class', 'mapLayer'),
+              ptsLayer = mapSvg.append('g').attr('class', 'ptsLayer');
 
-          ptsLayer.style('background', 'rgba(0,0,0,0)');
+          mapLayer.style({'height': height+'px', 'width': width+'px', 'z-index': -1000});
+
+          ptsLayer.style({'height': height+'px', 'width': width+'px', 'z-index': 1});
 
           // Append map primitive paths (e.g., water, roads, etc.)
           function drawMap() {
@@ -72,7 +75,7 @@ angular.module('prototypeApp')
           drawMap();
 
           // Append the points from data
-          var locCircles = ptsLayer.append('g').selectAll('circle')
+          var locCircles = ptsLayer.append('svg').append('g').selectAll('circle')
             .data(data)
             .enter()
               .append('circle')
