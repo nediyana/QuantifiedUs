@@ -24,10 +24,10 @@ body {
   stroke-linecap: round;
 }
 
-.tile .major_road { stroke: #776; }
-.tile .minor_road { stroke: #ccb; }
-.tile .highway { stroke: #f39; stroke-width: 1.5px; }
-.tile .rail { stroke: #7de; }
+.major_road { stroke: #888; fill: none;}
+.minor_road { stroke: #ccc; fill: none;}
+.highway { stroke: #e1a259; stroke-width: 1.5px; fill: none;}
+.rail { stroke: #284b56; fill: none;}
 
 .info {
   position: absolute;

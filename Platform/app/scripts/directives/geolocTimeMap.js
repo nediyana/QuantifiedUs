@@ -30,7 +30,7 @@ angular.module('prototypeApp')
 
           var projection = d3.geo.mercator()
               .center(origin)
-              .scale((1 << 20) / 2 / Math.PI)
+              .scale((1 << 21) / 2 / Math.PI)
               .translate([width / 2, height / 2]);
 
           var tilePath = d3.geo.path()
@@ -125,7 +125,7 @@ angular.module('prototypeApp')
               .scaleExtent([1 << 20, 1 << 23])
               .translate(projection([-71.42, 41.83]).map(function(x) { return -x; }))
               .on('zoom', zoomFn);
-          map.call(zoom);
+          //map.call(zoom);
           function zoomFn() {
             var mapTiles = tiler.scale(zoom.scale())
                 .translate(zoom.translate())
@@ -147,8 +147,8 @@ angular.module('prototypeApp')
 
             drawTiledMap(image);
           }
-          zoomFn();
-          //drawMap(mapLayer);
+          //zoomFn();
+          drawMap(mapLayer);
 
           // Append the points from data
           var locCircles = ptsLayer.append('g').selectAll('circle')
@@ -162,7 +162,8 @@ angular.module('prototypeApp')
                   return projection([d.lon,d.lat])[1];
                 })
                 .attr('r', 3)
-                .attr('fill', 'rgba(50,200,50,1');
+                .attr('fill', '#69a139')
+                .attr('stroke', '#275a37');
 
         /////////// Util functions
         function mousemoved() {
