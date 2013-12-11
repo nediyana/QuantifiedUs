@@ -29,7 +29,7 @@ angular.module('prototypeApp')
               .projection(projection);
 
           // Append all the map core features like roads, lakes, etc.
-          var mapContainer = d3.select(element[0]).append('div')
+          var map = d3.select(element[0]).append('div')
               .attr('class', 'map')
               .style('width', width + 'px')
               .style('height', height + 'px')
@@ -38,15 +38,15 @@ angular.module('prototypeApp')
           var info = mapContainer.append('div')
               .attr('class', 'info');
 
-          var map = mapContainer.append('svg');
-
-          var mapLayer = map.append('g'),
-              ptsLayer = map.append('g');
+          var mapLayer = map.append('div').attr('class', 'mapLayer'),
+              ptsLayer = map.append('svg').append('g');
 
           ptsLayer.style('background', 'rgba(0,0,0,0)');
 
           // Append map primitive paths (e.g., water, roads, etc.)
-          mapLayer.selectAll('g')
+          function drawMap() {
+            var image = mapLayer.append('svg');
+            image.selectAll('g')
               .data(tiler
                 .scale(projection.scale() * 2 * Math.PI)
                 .translate(projection([0, 0])))
@@ -68,6 +68,8 @@ angular.module('prototypeApp')
                   .attr('d', tilePath);
                 });
               });
+          }
+          drawMap();
 
           // Append the points from data
           var locCircles = ptsLayer.append('g').selectAll('circle')
