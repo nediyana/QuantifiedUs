@@ -30,12 +30,24 @@ body {
 .rail { stroke: #284b56; fill: none;}
 
 .info {
-  position: absolute;
+/*  position: absolute;
   bottom: 10px;
-  left: 10px;
+  left: 10px;*/
 }
 
 .water {
     fill: #ccccff;
     stroke: none;
+}
+.resize {
+  fill: rgba(100,100,100,.5);
+  stroke: rgba(50,50,50, .9);
+}
+.extent {
+  fill: rgba(100,100,100,.5);
+  stroke: rgb(50,50,50);
+}
+.selectedGeoLoc {
+  fill: #cb3e31;
+  stroke: #643432;
 }
