@@ -5,7 +5,7 @@ angular.module('prototypeApp')
     // constants
 
     var height = 500,
-        origin = [-71.42, 41.83], // seatle: -122.33, 47.65; pvd: -71.42, 41.83
+        origin = [-122.33, 47.65], // seatle: -122.33, 47.65; pvd: -71.42, 41.83
         width = 900;
 
     return {
@@ -30,7 +30,7 @@ angular.module('prototypeApp')
 
           var projection = d3.geo.mercator()
               .center(origin)
-              .scale((1 << 21) / 2 / Math.PI)
+              .scale((1 << 22) / 2 / Math.PI)
               .translate([width / 2, height / 2]);
 
           var tilePath = d3.geo.path()
@@ -191,7 +191,7 @@ angular.module('prototypeApp')
               minDate = new Date(Math.min.apply(null,dates));
 
           var margin = {top: 0, right: 17, bottom: 75, left: 17},
-              brushWidth = 900 - margin.left - margin.right,
+              brushWidth = 920 - margin.left - margin.right,
               brushHeight = 100 - margin.top - margin.bottom;
 
           var dateX = d3.time.scale()
@@ -211,7 +211,8 @@ angular.module('prototypeApp')
             .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
 
           var svgBrush = d3.select(element[0]).append("svg")
-            .attr("width", brushWidth + margin.left + margin.right)
+            .attr("width", 920)
+            .style('width', brushWidth+'px')
             .attr("height", brushHeight + margin.top + margin.bottom)
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

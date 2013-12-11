@@ -1,4 +1,5 @@
 body {
+  background-color: #faf7fc !important;
   margin: 0;
 }
 
@@ -50,4 +51,14 @@ body {
 .selectedGeoLoc {
   fill: #cb3e31;
   stroke: #643432;
+}
+
+.container {
+  width: 730px !important;
+}
+.jumbotron {
+  background: url(../images/blurBG.png);
+}
+.jumbotron h1, .jumbotron p {
+  color: #ccc !important;
 }

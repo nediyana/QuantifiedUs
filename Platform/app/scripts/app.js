@@ -19,6 +19,10 @@ angular.module('prototypeApp', [
         templateUrl: 'views/activityStackchart.html',
         controller: 'ActivityStackchartCtrl'
       })
+      .when('/loadData', {
+        templateUrl: 'views/load.html',
+        controller: 'LoadDataCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
