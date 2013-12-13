@@ -43,9 +43,12 @@ angular.module('prototypeApp')
               .style('height', height + 'px')
               .on('mousemove', mousemoved);
 
+          // The info div houses mouse over latlon coordinate text
           var info = d3.select(element[0]).append('div')
-              .attr('class', 'info');
+              .attr('class', 'info')
+              .style('min-height', '20px');
 
+          // The SVG that contains all layers of the map
           var mapSvg = map.append('svg'),
               mapLayer = mapSvg.append('g').attr('class', 'mapLayer'),
               ptsLayer = mapSvg.append('g').attr('class', 'ptsLayer');
@@ -55,8 +58,8 @@ angular.module('prototypeApp')
           ptsLayer.style({'height': height+'px', 'width': width+'px', 'z-index': 1});
 
           // Append map primitive paths (e.g., water, roads, etc.)
+          // drawMap() is the function for drawing a static map
           function drawMap(image) {
-            console.log(projection.scale(), zoom.scale());
             image.selectAll('g')
               .data(tiler
                 .scale(projection.scale() * 2 * Math.PI)
@@ -64,27 +67,34 @@ angular.module('prototypeApp')
               .enter().append('g')
               .each(function(d) {
                 var g = d3.select(this);
-                this._xhrWaterTiles = d3.json('http://' + ['a', 'b', 'c'][(d[0] * 31 + d[1]) % 3] + '.tile.openstreetmap.us/vectiles-water-areas/' + d[2] + '/' + d[0] + '/' + d[1] + '.json', function(error, json) {
-                g.append('g').selectAll('path')
-                  .data(json.features.sort(function(a, b) { return a.properties.sort_key - b.properties.sort_key; }))
-                  .enter().append('path')
-                  .attr('class', 'water')
-                  .attr('d', tilePath);
+                this._xhrWaterTiles = d3.json('http://' + ['a', 'b', 'c'][(d[0]* 31 + d[1]) % 3] +
+                    '.tile.openstreetmap.us/vectiles-water-areas/' + d[2] + '/' + d[0] + '/' + d[1]
+                    + '.json', function(error, json) {
+                  g.append('g').selectAll('path')
+                    .data(json.features.sort(function(a, b) { return a.properties.sort_key -
+                        b.properties.sort_key; }))
+                    .enter().append('path')
+                    .attr('class', 'water')
+                    .attr('d', tilePath);
                 });
-                this._xhrTiles = d3.json('http://' + ['a', 'b', 'c'][(d[0] * 31 + d[1]) % 3] + '.tile.openstreetmap.us/vectiles-highroad/' + d[2] + '/' + d[0] + '/' + d[1] + '.json', function(error, json) {
-                g.append('g').selectAll('path')
-                  .data(json.features.sort(function(a, b) { return a.properties.sort_key - b.properties.sort_key; }))
-                  .enter().append('path')
-                  .attr('class', function(d) { return d.properties.kind; })
-                  .attr('d', tilePath);
+                this._xhrTiles = d3.json('http://' + ['a', 'b', 'c'][(d[0] * 31 + d[1]) % 3] +
+                    '.tile.openstreetmap.us/vectiles-highroad/' + d[2] + '/' + d[0] + '/' + d[1] +
+                    '.json', function(error, json) {
+                  g.append('g').selectAll('path')
+                    .data(json.features.sort(function(a, b) { return a.properties.sort_key -
+                        b.properties.sort_key; }))
+                    .enter().append('path')
+                    .attr('class', function(d) { return d.properties.kind; })
+                    .attr('d', tilePath);
                 });
               });
           }
 
           function drawTiledMap(image) {
+            console.log('drawTiledMap()');
             var map = image.enter().append("g")
                 .attr("class", "tile")
-                .style("left", function(d) { return d[0] * 256 + "px"; })
+                .style("left", function(d) { console.log(d[0]);return d[0] * 256 + "px"; })
                 .style("top", function(d) { return d[1] * 256 + "px"; })
                 .each(function(d) {
                   var svg = d3.select(this);
@@ -123,9 +133,12 @@ angular.module('prototypeApp')
           var zoom = d3.behavior.zoom()
               .scale(projection.scale() * 2 * Math.PI)
               .scaleExtent([1 << 20, 1 << 23])
-              .translate(projection([-71.42, 41.83]).map(function(x) { return -x; }))
+              .translate(projection(origin))//projection([-71.42, 41.83]))//.map(function(x) { console.log(x); return -x; }))
               .on('zoom', zoomFn);
-          //map.call(zoom);
+          // projection
+          //   .scale(1 / 2 / Math.PI)
+          //   .translate([0, 0]);
+          map.call(zoom);
           function zoomFn() {
             var mapTiles = tiler.scale(zoom.scale())
                 .translate(zoom.translate())
@@ -134,7 +147,7 @@ angular.module('prototypeApp')
                 .scale(zoom.scale() / 2 / Math.PI)
                 .translate(zoom.translate());
 
-            var image = mapLayer.style(transPrefix + 'transform', matrix3d(mapTiles.scale, mapTiles.translate))
+            var image = mapLayer//.style(transPrefix + 'transform', matrix3d(mapTiles.scale, mapTiles.translate))
               .selectAll('.tile')
                 .data(mapTiles, function(d) { return d; });
 
@@ -148,7 +161,7 @@ angular.module('prototypeApp')
             drawTiledMap(image);
           }
           //zoomFn();
-          drawMap(mapLayer);
+          //drawMap(mapLayer);
 
           // Append the points from data
           var locCircles = ptsLayer.append('g').selectAll('circle')

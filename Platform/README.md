@@ -14,3 +14,6 @@ To run the application navigate to `prototype/frontEnd` and type `node server.js
 ## Geolocation Features
 ### Data format expectations
 Currently VACUM expects a CSV file with each row having entries in lat, lon, time ordering. An example would be 6.101333, 1.147733,2013-07-22 15:52:43.
+
+# Contribution notes
+All files have column counts of either 80 or 100 columns.
