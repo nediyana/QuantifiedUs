@@ -32,12 +32,21 @@ angular.module('prototypeApp')
             .append('td')
             .append('select')
               .selectAll('option')
-              .data([{k:'activity',v:'Activity Stacked Linechart'},
+              .data([ {k:'none', v:'Do not use'},
+                      {k:'activity', v:'Activity Stacked Linechart'},
                       {k: 'geoloc', v:'Geolocation Plotted Map'}])
               .enter()
               .append('option')
                 .attr('value', function(d) { return d.k; })
                 .text(function(d){ return d.v; });
+
+          // var el = $compile('<geoloc-time-map val="data"></geoloc-time-map>')($scope);
+          var loadBtn = elem.append('button')
+              .attr('class', 'btn btn-primary')
+              .text('Load data')
+              .on('click', function(){
+                // elem.node().append(el);
+              });
         });
       }
     };
