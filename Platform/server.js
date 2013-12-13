@@ -12,11 +12,11 @@ app.use(express.bodyParser());
 app.use(express.static(__dirname + '/app'));
 
 app.get('/geolocTimeData', function(req, res) {
-  res.sendfile('data/locations.json');
+  res.sendfile('data/geoLocsSample.json');
 });
 
 app.get('/activityData', function(req, res) {
-  res.sendfile('data/sampleActivity_daily.json');
+  res.sendfile('data/activitySample_daily.json');
 });
 
 app.get('/dataFileList', function(req, res) {
