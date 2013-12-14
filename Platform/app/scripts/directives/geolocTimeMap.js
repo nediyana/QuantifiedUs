@@ -92,17 +92,20 @@ angular.module('prototypeApp')
 
           function drawTiledMap(image) {
             console.log('drawTiledMap()');
+            // image.append('rect').attr('width', 100).attr('height', 100)
+            //     .style({'width': 100, 'height': 100, 'fill': 'red'});
+
             var map = image.enter().append("g")
                 .attr("class", "tile")
-                .style("left", function(d) { console.log(d[0]);return d[0] * 256 + "px"; })
-                .style("top", function(d) { return d[1] * 256 + "px"; })
+                .style("left", function(d) { return 0;console.log(d[0]);return d[0] * 256 + "px"; })
+                .style("top", function(d) { return 0; console.log(d[1]);return d[1] * 256 + "px"; })
                 .each(function(d) {
                   var svg = d3.select(this);
                   this._xhr = d3.json("http://" + ["a", "b", "c"][(d[0] * 31 + d[1]) % 3] + ".tile.openstreetmap.us/vectiles-highroad/" + d[2] + "/" + d[0] + "/" + d[1] + ".json", function(error, json) {
                     var k = Math.pow(2, d[2]) * 256; // size of the world in pixels
 
                     tilePath.projection()
-                        .translate([k / 2 - d[0] * 256, k / 2 - d[1] * 256]) // [0°,0°] in pixels
+                        .translate(projection(origin))//[k / 2 - d[0] * 256, k / 2 - d[1] * 256]) // [0°,0°] in pixels
                         .scale(k / 2 / Math.PI);
 
                     svg.append('g').selectAll("path")
@@ -138,7 +141,9 @@ angular.module('prototypeApp')
           // projection
           //   .scale(1 / 2 / Math.PI)
           //   .translate([0, 0]);
-          map.call(zoom);
+          //map.call(zoom);
+
+
           function zoomFn() {
             var mapTiles = tiler.scale(zoom.scale())
                 .translate(zoom.translate())
@@ -157,11 +162,13 @@ angular.module('prototypeApp')
                   this._xhrWater.abort();
                 })
                 .remove();
+            console.log(image.data());
+            console.log('----');
 
             drawTiledMap(image);
           }
           //zoomFn();
-          //drawMap(mapLayer);
+          drawMap(mapLayer);
 
           // Append the points from data
           var locCircles = ptsLayer.append('g').selectAll('circle')
