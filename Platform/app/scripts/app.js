@@ -11,13 +11,17 @@ angular.module('prototypeApp', [
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
+      .when('/activityStackchart', {
+        templateUrl: 'views/activityStackchart.html',
+        controller: 'ActivityStackchartCtrl'
+      })
       .when('/geolocTimeMap', {
         templateUrl: 'views/geolocTimeMap.html',
         controller: 'GeolocTimeMapCtrl'
       })
-      .when('/activityStackchart', {
-        templateUrl: 'views/activityStackchart.html',
-        controller: 'ActivityStackchartCtrl'
+      .when('/launch', {
+        templateUrl: 'views/launch.html',
+        controller: 'LaunchCtrl'
       })
       .when('/loadData', {
         templateUrl: 'views/load.html',

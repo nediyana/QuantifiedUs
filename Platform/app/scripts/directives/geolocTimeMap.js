@@ -286,6 +286,6 @@ angular.module('prototypeApp')
         /////////////////////////////////
 
         }); // end data request
-      }
+      }, // end link: function postLink() { ... }
     };
   });
