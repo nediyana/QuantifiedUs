@@ -15,6 +15,14 @@ app.get('/geolocTimeData', function(req, res) {
   res.sendfile('data/geoLocsSample.json');
 });
 
+app.get('/activityStats', function(req, res) {
+  var analFile = 'activityStatistics.py',
+      args = 'data/activities.json';
+  launchScript(analFile, args, function(data) {
+    res.send(data);
+  });
+});
+
 app.get('/activityData', function(req, res) {
   res.sendfile('data/activitySample_daily.json');
 });
@@ -31,6 +39,30 @@ app.get('/dataFileList', function(req, res) {
   });
   console.log('data file list requested');
 });
+
+////////////////////////////////////////////////////////////////////////////////
+// Test external launch
+function launchScript(fileName, args, callback) {
+  var analFile = fileName,
+      args = dataPath,
+      exec = require('child_process').exec,
+      child = exec('python analyses/' + analFile + ' ' + args, function( error, stdout, stderr) {
+        if ( error != null ) {
+          console.log(stderr);
+          // error handling & exit
+        }
+
+        callback(JSON.parse(stdout));
+      });
+  return child;
+}
+
+var dataPath = 'data/activities.json',
+    fPath = 'activityStatistics.py',
+    test = launchScript(fPath, dataPath, function(data) {
+      console.log(data);
+    });
+
 
 // Create the server and tell which port to listen to
 http.createServer(app).listen(port, function (err) {
