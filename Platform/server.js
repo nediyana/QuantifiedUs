@@ -17,7 +17,7 @@ app.get('/geolocTimeData', function(req, res) {
 
 app.get('/activityStats', function(req, res) {
   var analFile = 'activityStatistics.py',
-      args = 'data/activities.json';
+      args = 'data/activitySample_daily.json';
   launchScript(analFile, args, function(data) {
     res.send(data);
   });
@@ -44,24 +44,30 @@ app.get('/dataFileList', function(req, res) {
 // Test external launch
 function launchScript(fileName, args, callback) {
   var analFile = fileName,
-      args = dataPath,
+      args = args,
       exec = require('child_process').exec,
       child = exec('python analyses/' + analFile + ' ' + args, function( error, stdout, stderr) {
         if ( error != null ) {
           console.log(stderr);
           // error handling & exit
         }
-
+        console.log(args);
         callback(JSON.parse(stdout));
       });
   return child;
 }
 
-var dataPath = 'data/activities.json',
-    fPath = 'activityStatistics.py',
-    test = launchScript(fPath, dataPath, function(data) {
-      console.log(data);
-    });
+var analFile = 'activityStatistics.py',
+    args = 'data/activitySample_daily.json';
+launchScript(analFile, args, function(data) {
+  console.log(data);
+});
+
+// var dataPath = 'data/activities.json',
+//     fPath = 'activityStatistics.py',
+//     test = launchScript(fPath, dataPath, function(data) {
+//       console.log(data);
+//     });
 
 
 // Create the server and tell which port to listen to

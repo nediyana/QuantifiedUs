@@ -9,19 +9,25 @@ json_data=open(f)
 data = json.load(json_data)
 json_data.close()
 
-# pprint(data)
-
 def convertValues(vals):
   # durations = [d['y'] for d in vals]
-  duration = vals['y']
-  tkns = duration.split(':')
-  # convert HH:MM:SS string to seconds integer
-  time = int(tkns[0]) * 3600 + int(tkns[1]) * 60 + int(tkns[2])
-  return time
+  # duration = vals['y']
+  # tkns = duration.split(':')
+  # convert HH:MM:SS string to seconds integer, in case formatted in this way
+  # time = int(tkns[0]) * 3600 + int(tkns[1]) * 60 + int(tkns[2])
+
+  print vals
+  print '----'
+  return 0
 def simplifyCategories(c):
-  vals = [convertValues(v) for v in c['values']]
+  name = c['key']
+  vals = [v[1] for v in c['values']]
+  vals = [v for v in vals if v != 0]
   vals.sort()
-  name = c['name']
+
+  # vals = [convertValues(v) for v in c['values']]
+  # vals.sort()
+  # name = c['name']
 
   # time = duration time in seconds
   totalTime = sum(vals)
