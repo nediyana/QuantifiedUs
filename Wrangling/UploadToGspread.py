@@ -24,14 +24,20 @@ def upload_to_gspread(input_file, gdrive_id, gdrive_pw, gdrive_file, gdrive_shee
 	input_list = [list(x) for x in input_data.itertuples()]
 
 	# Login with your Google account
-	gc = gspread.login(gdrive_id, gdrive_pw)
+	gs = gspread.login(gdrive_id, gdrive_pw).open(gdrive_file)
 
+	#pdb.set_trace()
 	# Open a worksheet from spreadsheet with one shot
-	wks = gc.open(gdrive_file).worksheet(gdrive_sheet)
+	try:
+		gs.del_worksheet(gs.worksheet(gdrive_sheet))
+	except:
+		print("No sheet found...")
+
+	wks = gs.add_worksheet(title=gdrive_sheet, rows=len(input_data), cols=len(input_data.columns))
 
 	# Fetch a cell range
-	range_str = 'A1:' + string.uppercase[len(input_data.columns)]+str(len(input_data))
-	pdb.set_trace()
+	range_str = 'A1:' + string.uppercase[len(input_data.columns)-1]+str(len(input_data))
+	print(range_str)
 	cell_list = wks.range(range_str)
 	for cell in cell_list:
 	    cell.value = input_list[cell.row-1][cell.col]
