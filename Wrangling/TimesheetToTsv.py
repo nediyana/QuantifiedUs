@@ -5,6 +5,7 @@ import json
 import datetime
 import xml.etree.ElementTree as ET
 from dateutil import tz
+from Config import *
 
 # REMARKS
 #
@@ -12,20 +13,19 @@ from dateutil import tz
 # This script should be run on a computer where the local timezone is the same as the time zone recorded in Timesheet
 
 # PARAMETERS
-TIMESHEET_PATH = '/Apps/Timesheet/'
 
 def parse_time(timestr):
     res = map(lambda(e): int(e), re.findall(r"\d\d?", timestr))
     #print timestr, res
     return res[0] * 60 + res[1]
 
-def timesheet_to_csv(input_path, output_schedule_csv, input_dropbox_access_token = None):
+def timesheet_to_csv(input_path, output_schedule_csv): #, input_dropbox_access_token = None):
 	print input_path, output_schedule_csv
 	# download the latest Timesheep backup file to TIMESHEET_XML
-	if input_dropbox_access_token:
-		TIMESHEET_XML = read_from_dropbox(input_path, input_dropbox_access_token)
-	else:
-		TIMESHEET_XML = read_from_path(input_path)
+	#if input_dropbox_access_token:
+	TIMESHEET_XML = read_recent_from_dropbox(input_path)#, input_dropbox_access_token)
+	#else:
+	#	TIMESHEET_XML = read_recent_from_path(input_path)
 	
 	# gets a list of the valid projects
 	projects = {}
@@ -38,8 +38,8 @@ def timesheet_to_csv(input_path, output_schedule_csv, input_dropbox_access_token
 		projects[projid] = (projname, projemployer)
 	
 	# convert TIMESHEET_XML to CSV and output to output_schedule_csv
-	timesheetCsv = open(output_schedule_csv, 'w')
-	timesheetCsv.write('\t'.join(["Date", "StartTime", "Duration", "Project", "Category", "Description"]) + '\n')
+	timesheetCsv = ""
+	timesheetCsv += ('\t'.join(["Date", "StartTime", "Duration", "Project", "Category", "Description"]) + '\n')
 	for task in root.find('tasks'):
 		projid = task.find('projectId').text
 		if projid not in projects:
@@ -59,8 +59,8 @@ def timesheet_to_csv(input_path, output_schedule_csv, input_dropbox_access_token
 			category = 'Uncategorized'
 		if description is None:
 			description = ''
-		timesheetCsv.write('\t'.join([startDate, startTime, str(parse_time(duration)), projectName, category, description]) + '\n')
-	timesheetCsv.close()
+		timesheetCsv += ('\t'.join([startDate, startTime, str(parse_time(duration)), projectName, category, description]) + '\n')
+	write_dropbox(output_schedule_csv, timesheetCsv, DROPBOX_TOKEN)
 	return
 
 if __name__ == "__main__":
