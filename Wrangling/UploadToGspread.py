@@ -1,7 +1,6 @@
 from init_qus import *
 import gspread
 import string
-import pdb
 
 AP = argparse.ArgumentParser(description='Upload TSV into Google Drive')
 AP.add_argument("input_file")
@@ -26,8 +25,6 @@ def upload_to_gspread(input_file, gdrive_id, gdrive_pw, gdrive_file, gdrive_shee
 	# Login with your Google account
 	gs = gspread.login(gdrive_id, gdrive_pw).open(gdrive_file)
 
-	#pdb.set_trace()
-	# Open a worksheet from spreadsheet with one shot
 	try:
 		gs.del_worksheet(gs.worksheet(gdrive_sheet))
 	except:

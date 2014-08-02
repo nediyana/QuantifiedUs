@@ -2,15 +2,18 @@ from init_qus import *
 import sqlite3
 
 
-def export_habbits(input_file, output_file):
-	con = sqlite3.connect(input_file)
+def habbits_to_tsv(input_file, output_file):
+	tf_name = join(TMP_PATH, "habbits.db")
+	tf = open(tf_name, "wb"); tf.write(read_dropbox(input_file)); tf.close()
+	con = sqlite3.connect(tf_name)
 	c = con.cursor()
 	
 	c.execute("select H.Name, C.date, C.type AS String, C.note FROM Habits H, CHECKINS C WHERE H._id = C.Habit_id;");
      
-	f = open(output_file, "w")
-	f.write("\t".join(["Habit", "Date", "Result", "Note"]) + "\n")
+	res = ""
+	res += ("\t".join(["Habit", "Date", "Result", "Note"]) + "\n")
 	for l in c.fetchall():
 		#print l
-		f.write("\t".join([str(e) for e in l]) + "\n")
+		res += ("\t".join([str(e) for e in l]) + "\n")
+	write_dropbox(output_file, res)
 	return

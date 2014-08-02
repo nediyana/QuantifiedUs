@@ -9,6 +9,9 @@ Created on Sun Jul 20 21:32:43 2014
 @author: jink
 """
 
+def ujoin(path1, path2):
+	return path1 + "/" + path2
+
 def read_dropbox(filename, dropbox_access_token = DROPBOX_TOKEN):
 	client = dropbox.client.DropboxClient(dropbox_access_token)
 	return client.get_file(filename).read()
