@@ -8,7 +8,7 @@ from pandas import Series, DataFrame
 import dateutil.parser as dparser
 #from lib_init import *
 from datetime import *
-
+import numpy as np
 
 def fix_columns(dframe):
     dcols = dframe.columns.values

@@ -18,6 +18,7 @@ def number_to_col(num):
     return res
 number_to_col(25)
 
+
 def upload_to_gspread(input_file, gdrive_id, gdrive_pw, gdrive_file, gdrive_sheet):
 	input_data = pd.read_csv(input_file, sep="\t")
 	input_list = [list(x) for x in input_data.itertuples()]

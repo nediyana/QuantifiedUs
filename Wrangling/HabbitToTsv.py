@@ -1,3 +1,6 @@
+from Config import *
+from os.path import *
+from IO_qus import *
 from init_qus import *
 import sqlite3
 
