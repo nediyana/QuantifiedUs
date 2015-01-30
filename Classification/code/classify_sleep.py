@@ -11,73 +11,30 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import classification_report, confusion_matrix #can't find this???
 from sklearn import cross_validation
 from sklearn.naive_bayes import BernoulliNB
+from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.cross_validation import train_test_split
 
-#########################################################################
-# SLEEP DATA 
+########################################################################################################################
 #
-# There are three steps in processing the data:
-# 1. Classification
-# 2. Correlation
-# 3. Causation
+# CLASSIFY_SLEEP.PY
 #
-# The broader goal here is to provide recommendations for improving sleep,
-# both based on an individual's own data, and based on a larger dataset.
-# To start, we'll focus on an individual's own data and try to use the 
-# first two thirds of that data to predict information that we can verify
-# in the last third of the data. 
+# To run, navigate to the directory where this code is, and:
+# python classify_sleep.py -data [path to data] -c [classifier: nb | lr | log | svm] -m [size: gen | ind] -v [1 | 0]
 #
-# CLASSIFICATION
-# There are some basic things we should be able to classify:
-#	- Movement (what counts as a movement 'event' given raw data?)
-#	- Noise (what is a noise 'event' given raw data?)
-#	- Using that data (and other), when is a person asleep?
-# After we have these kinds of data and others, the raw data is 
-# sufficiently annotated for other classification. 
 # 
-# CORRELATION
-# I'm not totally sure where this fits in, but I think it's ike this:
-# Before we train a classifier to recognize and categorize different 
-# sleep events and phenomena, if we can show with a simple measure
-# of correlation that two attributes are correlated, then we will 
-# know that we can train a classifier to, with some reasonable
-# accuracy, predict an event or phenomenon when given test data. 
-# Otherwise, if two attributes seem completely unrelated (correlation
-# is at chance), we can't expect a classifier to use one attribute
-# to reliably predict the other. 
 #
-# CAUSATION
-# In order to give recommendations, we need to have some faith that the 
-# attributes which we see are correlated also have (ideally) some
-# causal relationship. This allows us to strongly make the claim that 
-# by following some piece of advice, the user will actually see changes
-# in their sleep. 
-# The important thing with causation is first to establish that the 
-# events being considered are in chronological order, and that changing
-# the first predicts a change in the second for new (testing) data.
-# In addition, a causation claim is much stronger if you can identify
-# a mechanism by which this process occurs. 
 #
-# PRE-PROCESSING
-# To preprocess, we need to be able to annotate the raw data with some
-# other variables:
-#	- Number/magnitude of movement/noise events per night
-#	- How many hours slept?
-#	- Is it a weekend?
-#	- How many hours slept over the last few nights?
-#		- Were there any esp. short sleeps over the previous 3 nights? 
-#########################################################################
-
+########################################################################################################################
 
 def main():
 	##### OPTIONS #############################################
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-training', required=True, help='Path to training data')
-	parser.add_argument('-test', help='Path to test data')
-	parser.add_argument('-c', '--classifier', default='nb', help='nb | log | svm')
-	parser.add_argument('-top', type=int, help='Number of top features to show')
+	parser.add_argument('-data', required=True, help='Path to data')
+	parser.add_argument('-c', '--classifier', default='nb', help='nb | lr | log | svm')
+	parser.add_argument('-m', '--model', default='gen', help='gen | ind')
+	parser.add_argument('-v', '--verbose', help='verbose output')
 	opts = parser.parse_args()
 	############################################################
 
@@ -85,42 +42,100 @@ def main():
 	vectorizer = DictVectorizer(separator=',')
 
 	# Load training text and training labels
-	csv_file = open(opts.training)
+	csv_file = open(opts.data)
 	csv_reader = csv.reader(csv_file)
 	next(csv_reader, None) # skip the header in the csv file
 
+	# CLASSIFY WITH EVERYONE
 	data = []
 	labels = []
-	next_item = next(csv_reader, None) #get first data point
-	distr = [0,0,0,0,0]
-	while next_item != None and next_item[0] == '013': 
-		quality = next_item[8] #sleep quality
-		tts = int(next_item[9])
-		moveEvents = int(next_item[7]) #number of move events per night
-		data.append(moveEvents)
-		data.append(tts)
-		labels.append(quality)
-		# distr[int(quality)-1] = distr[int(quality)-1] + 1 #count number per category
-		next_item = next(csv_reader, None)
-	csv_file.close()
+	next_item = next(csv_reader, None)
 
-	# data_train = np.reshape(data_train, (len(labels), 1))
-	# data_test = np.reshape(data_test, (len(labels), 1))
-	data = np.reshape(data, (len(labels), 2) )
-	print data
+	if opts.model == 'gen':
+		while next_item != None: 
+			# quality = int(next_item[8]) #sleep quality
+			# tts = int(next_item[9])
+			# moveEvents = int(next_item[7]) #number of move events per night
+			# data.append(moveEvents)
+			# data.append(tts)
+			# labels.append(quality)
 
-	data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.20)
-	
-	print distr
+			isAsleep = int(next_item[2])
+			avgMove = float(next_item[1])
+			data.append(avgMove)
+			labels.append(isAsleep)
 
-	# ############################################################
+			next_item = next(csv_reader, None)
+		csv_file.close()
+
+		# data_train = np.reshape(data_train, (len(labels), 1))
+		# data_test = np.reshape(data_test, (len(labels), 1))
+
+		# data = np.reshape(data, (len(labels), 2) ) #two features
+		data = np.reshape(data, (len(labels), 1) ) #only one feature
+		data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.20)
+
+		print "GENERAL CLASSIFIER:", opts.classifier
+		[acc, test_acc] = classify(opts, data_train, data_test, labels_train, labels_test)
+		print "accuracy:", acc
+		print "test accuracy:", test_acc
 
 
+	# CLASSIFY PER INDIVIDUAL
+	if opts.model == 'ind':
+		print "CLASSIFIER BY USER:", opts.classifier
+
+		num_items = 0
+		accuracies = [0,0]
+		while next_item != None:
+			num_items += 1
+			user = next_item[0]
+			data = []
+			labels = []
+			next_item = next(csv_reader, None)
+			while next_item != None and next_item[0] == user:
+				# quality = int(next_item[8]) #sleep quality
+				# tts = int(next_item[9])
+				# moveEvents = int(next_item[7]) #number of move events per night
+				# data.append(moveEvents)
+				# data.append(tts)
+				# labels.append(quality)
+
+				isAsleep = int(next_item[2])
+				avgMove = float(next_item[1])
+				data.append(avgMove)
+				labels.append(isAsleep)
+
+				next_item = next(csv_reader, None)
+			if opts.verbose:
+				print "\nuser ID:", user
+			# data_train = np.reshape(data_train, (len(labels), 1))
+			# data_test = np.reshape(data_test, (len(labels), 1))
+
+			# data = np.reshape(data, (len(labels), 2) ) #two features
+			data = np.reshape(data, (len(labels), 1) ) #only one feature
+			data_train, data_test, labels_train, labels_test = train_test_split(data, labels, test_size=0.20)
+
+			[acc, test_acc] = classify(opts, data_train, data_test, labels_train, labels_test)
+			accuracies[0] += acc
+			accuracies[1] += test_acc
+		csv_file.close()
+		print "number of users:", num_items
+		print "average accuracy:", float(accuracies[0])/num_items
+		print "average test accuracy:", float(accuracies[1])/num_items
+
+
+# ############################################################
+
+def classify(opts, data_train, data_test, labels_train, labels_test):
 	# ##### TRAIN THE MODEL ######################################
 	# Initialize the corresponding type of the classifier and train it (using 'fit')
 	if opts.classifier == 'nb':
 		classifier = BernoulliNB(binarize=None)
 		
+	elif opts.classifier == 'lr':
+		classifier = LinearRegression()
+
 	elif opts.classifier == 'log':
 		classifier = LogisticRegression()
 		
@@ -137,33 +152,43 @@ def main():
 	# ###### VALIDATE THE MODEL ##################################
 	# Print training mean accuracy
 	accuracy = classifier.score(data_train, labels_train)
-	print "accuracy = ", accuracy
+	if opts.verbose:
+		print "accuracy = ", accuracy
 	
 	# Perform 10 fold cross validation (cross_validation.cross_val_score) with scoring='accuracy'
 	# and print the mean score and std deviation
 	# cv = cross_validation.KFold()
-	cross_val_scores = cross_validation.cross_val_score(classifier, data_train, labels_train, scoring='accuracy', cv=10)
-	print "cross val mean = ",  cross_val_scores.mean()
-	print "cross val stdev = ", cross_val_scores.std()
+	if opts.classifier != 'lr':
+		cross_val_scores = cross_validation.cross_val_score(classifier, data_train, labels_train, scoring='accuracy', cv=10)
+		if opts.verbose:
+			print "cross val mean = ",  cross_val_scores.mean()
+			print "cross val stdev = ", cross_val_scores.std()
 
 	# ############################################################
 
-	accuracy = classifier.score(data_test, labels_test)
-	print "test accuracy = ", accuracy
+	test_accuracy = classifier.score(data_test, labels_test)
+	if opts.verbose:
+		print "test accuracy = ", test_accuracy
 
 	# Predict labels for the test set
 	labels_predicted = classifier.predict(data_test)
-	print "***************"
-	print labels_predicted
-	print labels_test
+	labels_predicted = np.round(labels_predicted, 2) #round to hundredths place for readability
+	# print "***************"
+	if opts.verbose:
+		print "actual labels:\n", labels_test
+		print "predicted labels:\n", labels_predicted
 
-	# Print the classification report
-	print "Classification Report:"
-	print classification_report(labels_test, labels_predicted)
+	return [accuracy, test_accuracy]
+	
+	# ############################################################
+	# ############# OTHER CLASSIFIER THINGS #############
+	# # Print the classification report
+	# print "Classification Report:"
+	# print classification_report(labels_test, labels_predicted)
 
-	# Print the confusion matrix
-	print "Confusion Matrix:"
-	print confusion_matrix(labels_test, labels_predicted)
+	# # Print the confusion matrix
+	# print "Confusion Matrix:"
+	# print confusion_matrix(labels_test, labels_predicted)
 
 	# # Get predicted label of the test set
 	# if opts.classifier != 'svm':
@@ -246,34 +271,62 @@ def main():
 	# 	else:
 	# 		# Use decision_funcion
 	# 		test_predicted_proba = classifier.decision_funcion(data_test)
-	
-	# ############################################################
-	
-	# # # this is just stuff to print out the tweets with highest predicted probability
-	# # # (both correctly- and incorrectly-classified)
-	# # 	correct = {}
-	# # 	incorrect = {}
+	##############################################################
 
-	# # 	for i in range(len(test_set)):
-	# # 		pred = labels_predicted[i]
-	# # 		if labels_test[i] != labels_predicted[i]: #incorrect
-	# # 			incorrect[test_set[i]] = float((test_predicted_proba[i])[pred])
-	# # 		else:
-	# # 			correct[test_set[i]] = float((test_predicted_proba[i])[pred])
-
-	# # 	sorted_correct = sorted(correct, key=correct.get, reverse=True)
-	# # 	sorted_incorrect = sorted(incorrect, key=incorrect.get, reverse=True)
-
-	# # 	for i in range(5):
-	# # 		print "CORRECT"
-	# # 		tweet = sorted_correct[i]
-	# # 		print tweet, correct[tweet]
-	# # 		print "INCORRECT"
-	# # 		tweet = sorted_incorrect[i]
-	# # 		print tweet, incorrect[tweet]
-
-
-	# ############################################################
+	#########################################################################
+	# SLEEP DATA (this is danae's random brainstorming)
+	#
+	# There are three steps in processing the data:
+	# 1. Classification
+	# 2. Correlation
+	# 3. Causation
+	#
+	# The broader goal here is to provide recommendations for improving sleep,
+	# both based on an individual's own data, and based on a larger dataset.
+	# To start, we'll focus on an individual's own data and try to use the 
+	# first two thirds of that data to predict information that we can verify
+	# in the last third of the data. 
+	#
+	# CLASSIFICATION
+	# There are some basic things we should be able to classify:
+	#	- Movement (what counts as a movement 'event' given raw data?)
+	#	- Noise (what is a noise 'event' given raw data?)
+	#	- Using that data (and other), when is a person asleep?
+	# After we have these kinds of data and others, the raw data is 
+	# sufficiently annotated for other classification. 
+	# 
+	# CORRELATION
+	# I'm not totally sure where this fits in, but I think it's ike this:
+	# Before we train a classifier to recognize and categorize different 
+	# sleep events and phenomena, if we can show with a simple measure
+	# of correlation that two attributes are correlated, then we will 
+	# know that we can train a classifier to, with some reasonable
+	# accuracy, predict an event or phenomenon when given test data. 
+	# Otherwise, if two attributes seem completely unrelated (correlation
+	# is at chance), we can't expect a classifier to use one attribute
+	# to reliably predict the other. 
+	#
+	# CAUSATION
+	# In order to give recommendations, we need to have some faith that the 
+	# attributes which we see are correlated also have (ideally) some
+	# causal relationship. This allows us to strongly make the claim that 
+	# by following some piece of advice, the user will actually see changes
+	# in their sleep. 
+	# The important thing with causation is first to establish that the 
+	# events being considered are in chronological order, and that changing
+	# the first predicts a change in the second for new (testing) data.
+	# In addition, a causation claim is much stronger if you can identify
+	# a mechanism by which this process occurs. 
+	#
+	# PRE-PROCESSING
+	# To preprocess, we need to be able to annotate the raw data with some
+	# other variables:
+	#	- Number/magnitude of movement/noise events per night
+	#	- How many hours slept?
+	#	- Is it a weekend?
+	#	- How many hours slept over the last few nights?
+	#		- Were there any esp. short sleeps over the previous 3 nights? 
+	#########################################################################
 
  		
 if __name__ == '__main__':

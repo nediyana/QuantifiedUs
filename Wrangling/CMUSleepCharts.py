@@ -80,12 +80,12 @@ for filename in os.listdir('data/'):
 		means = []
 		prevX = prevY = prevZ = None
 		moveEvents = 0
-		for result in results.fetchall():
+		for result in results.fetchall(): #for each time stamp
 			if not result[1]:
 				continue
 
 			values = []
-			for i in result[1].split('|'):
+			for i in result[1].split('|'): #for... what?
 				currX, currY, currZ = [float(v) for v in i.split(',')]
 				if prevX is None:
 					prevZ = currZ
@@ -116,10 +116,9 @@ for filename in os.listdir('data/'):
 			else:
 				beforeMidnight = "False"
 
-			timeSlept = (wakeUpTimeSeconds - fallAsleepTimeSeconds) *100
-
+			print csv([userid, timeOfInterest, currDatetimeSeconds, int(result[0] / 1000), max(values), min(values), round(sum(values)/len(values))])
 			# print csv([int(result[0] / 1000), max(values), min(values), round(sum(values)/len(values), 1)])
-		print csv([userid, currDatetimeDay, timeSlept, fallAsleepTime, wakeUpTime, outOfBedTime, moveEvents, sleepQuality, timeToFallAsleep, beforeMidnight])
+		# print csv([userid, currDatetimeDay, int(result[0] / 1000), fallAsleepTime, wakeUpTime, outOfBedTime, moveEvents, sleepQuality, timeToFallAsleep, beforeMidnight])
 		
 
 		########################
