@@ -79,7 +79,7 @@ def main():
 					isAsleep = float(next_item[5])* 0.5
 				currAccel = next_item[4]
 				values.append(float(currAccel))
-
+				
 				next_item = next(csv_reader, None)
 
 			# print currDatetime, currAccel, isAsleep
@@ -93,7 +93,6 @@ def main():
 			# print print_csv([userid, sum(values)/len(values), isAwake])
 
 		# print x
-		asleep[0] = 0
 		plot(x, mins)
 		plot(x, maxs)
 		fig, ax1 = subplots()
