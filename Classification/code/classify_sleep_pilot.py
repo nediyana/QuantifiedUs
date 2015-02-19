@@ -79,7 +79,7 @@ def main():
 	csv_test = csv.reader(csv_test)
 	next(csv_test, None) # skip the header in the csv file
 
-	print print_csv(['id', 'asleepTime','awakeTime','currTime','accel','isAsleep=1'])
+	print print_csv(['id', 'asleepTime','awakeTime','currTime','accel','isAsleep=1', 'noise'])
 	next_test = next(csv_test, None)
 
 	while next_test != None:
@@ -90,14 +90,17 @@ def main():
 		morning = next_test[2]
 		currTime = next_test[3]
 		accel = next_test[4]
+		noise = next_test[5]
 
 		while next_test != None and currTime == next_test[3]:
-			print print_csv( [userid,night,morning,currTime,accel,None] )#print previous night's stuff so that outside this loop the one with the averages gets printed
+			print print_csv( [userid,night,morning,currTime,accel,None, noise] )#print previous night's stuff so that outside this loop the one with the averages gets printed
 			userid = next_test[0]
 			night = next_test[1]
 			morning = next_test[2]
 			currTime = next_test[3]
 			accel = next_test[4]
+			if next_test[5] != "None":
+				noise = next_test[5]
 
 			avgMove += float(next_test[4])
 			numPts += 1
@@ -106,7 +109,7 @@ def main():
 		avgMove = float(avgMove)/numPts
 		pred = int(classifier.predict(avgMove)[0])
 		# print avgMove, pred
-		print print_csv( [userid,night,morning,currTime,accel,pred] )
+		print print_csv( [userid,night,morning,currTime,accel,pred, noise] )
 
 
 # ############################################################

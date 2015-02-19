@@ -35,6 +35,8 @@ def main():
 
 	nextLineWithTimes = next(csv_reader, None)
 	nextLineWithData = next(csv_reader, None)
+	nextLineWithNoise = next(csv_reader, None)
+
 	while nextLineWithTimes != None: #until all nights are finished
 		
 		userid = nextLineWithData[0]
@@ -55,15 +57,18 @@ def main():
 		# cycles = nextLineWithData[11]
 		# deepSleep = nextLineWithData[12]
 		# lenAdjust = nextLineWithData[13]
+		# next_noise = nextLineWithNoise[13]
 		# geolocation = nextLineWithData[14]
 
 		date = fromDate
-		for i in range(15, len(nextLineWithTimes)):
+		for i in range(15, len(nextLineWithTimes)): #read horizontally through the whole row
+
 			if not nextLineWithTimes[i][0].isdigit(): #stop before all the bullshit in that row
 				break
 			currTime = nextLineWithTimes[i]
 			currDatetime = parser.parse(currTime)
 
+			### deal with jump from 23:59 to 00:00 ###
 			if i > 15: #don't do this with the first one where there is no previous time 
 				prevTime = nextLineWithTimes[i-1]
 				prevDatetime = parser.parse(prevTime)
@@ -71,12 +76,18 @@ def main():
 				if currTime < prevTime: #if we just made a jump
 					date = toDate #update so that time is always the toDate
 				
+			### record data 
 			accel = nextLineWithData[i]
-			csv_writer.writerow([userid, fromDatetime, toDatetime, datetime.combine(date, currDatetime.time()), accel])
+			if nextLineWithNoise[i-2] != "":
+				noise = nextLineWithNoise[i-2]
+			else:
+				noise = "None"
+			csv_writer.writerow([userid, fromDatetime, toDatetime, datetime.combine(date, currDatetime.time()), accel, noise])
 
-		next(csv_reader, None) #skip line with noise stuff
 		nextLineWithTimes = next(csv_reader, None)
 		nextLineWithData = next(csv_reader, None)
+		nextLineWithNoise = next(csv_reader, None)
+
 
 	csv_outfile.close()
 
